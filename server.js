@@ -28,7 +28,7 @@ board.on("ready", function() {
   phSensor = new five.Sensor({
     pin: "A0",
     freq: 1000,
-  });x
+  });
 
   servo = new five.Servo(5);
   flowSensor = new five.Sensor.Digital(3); // Suponiendo que el sensor está en el pin 3.
