@@ -1,18 +1,23 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const mongoose = require('mongoose');
+const sqlite3 = require('sqlite3').verbose();
 const five = require("johnny-five");
 const board = new five.Board();
 
-// Conectarse a MongoDB
-mongoose.connect('mongodb://localhost/arduinoData', { useNewUrlParser: true, useUnifiedTopology: true });
+let db = new sqlite3.Database('./arduinoData.db', sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE, (err) => {
+  if (err) {
+    console.error(err.message);
+  }
+  console.log('Connected to the arduinoData database.');
+});
 
-// Definir un modelo de Mongoose para los datos del sensor
-const SensorData = mongoose.model('SensorData', new mongoose.Schema({
-  temperature: Number,
-  ph: Number,
-  createdAt: Date,
-}));
+db.run(`CREATE TABLE IF NOT EXISTS SensorData (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  temperature REAL,
+  ph REAL,
+  flow INTEGER,
+  createdAt TEXT
+)`);
 
 let temperatureSensor;
 let phSensor;
@@ -30,32 +35,11 @@ board.on("ready", function() {
     freq: 1000,
   });
 
-  servo = new five.Servo(5);
   flowSensor = new five.Sensor.Digital(3); // Suponiendo que el sensor está en el pin 3.
 });
 
 const app = express();
 app.use(bodyParser.json());
-
-app.post('/api/moveServo', (req, res) => {
-    const { position } = req.body;
-    
-    if (!servo) {
-      res.status(500).send("Board not ready yet");
-      return;
-    }
-    
-    if (typeof position !== "number" || position < 0 || position > 180) {
-      res.status(400).send("Invalid position");
-      return;
-    }
-    if (typeof position == 90){
-      servo.stop
-    }else{
-    servo.to(position); // Mover el servomotor a la posición especificada
-    res.send({ success: true });
-    }
-  });
 
 app.get('/api/temperature', async (req, res) => {
   if (!temperatureSensor) {
@@ -63,15 +47,16 @@ app.get('/api/temperature', async (req, res) => {
     return;
   }
 
-  // Guardar los datos del sensor en MongoDB
-  const sensorData = new SensorData({
-    temperature: temperatureSensor.celsius,
-    createdAt: new Date(),
+  // Guardar los datos del sensor en la base de datos SQLite
+  db.run(`INSERT INTO SensorData(temperature, createdAt) VALUES(?, ?)`, [temperatureSensor.celsius, new Date()], function(err) {
+    if (err) {
+      return console.log(err.message);
+    }
   });
-  await sensorData.save();
 
   res.send({ temperature: temperatureSensor.celsius });
 });
+
 // Función para convertir el valor en bruto del sensor de pH a un valor de pH real
 function convertToPH(sensorValue) {
   // Valores de referencia de calibración
@@ -87,6 +72,7 @@ function convertToPH(sensorValue) {
 
   return pHValue;
 }
+
 app.get('/api/ph', async (req, res) => {
   if (!phSensor) {
     res.status(500).send('Board not ready yet');
@@ -96,18 +82,16 @@ app.get('/api/ph', async (req, res) => {
   // Leer el valor en bruto del sensor de pH
   const rawValue = phSensor.value * (14.0/1023.0);
 
-  // Convertir el valor en bruto a un valor de pH real
-  //const pHValue = convertToPH(rawValue);
-  console.log(typeof phSensor.value);
-  // Guardar los datos del sensor en MongoDB
-  const sensorData = new SensorData({
-    ph: rawValue,
-    createdAt: new Date(),
+  // Guardar los datos del sensor en la base de datos SQLite
+  db.run(`INSERT INTO SensorData(ph, createdAt) VALUES(?, ?)`, [rawValue, new Date()], function(err) {
+    if (err) {
+      return console.log(err.message);
+    }
   });
-  await sensorData.save();
 
   res.send({ ph: rawValue });
 });
+
 app.get('/api/flow', async (req, res) => {
   if (!flowSensor) {
     res.status(500).send('Board not ready yet');
@@ -117,17 +101,16 @@ app.get('/api/flow', async (req, res) => {
   // Leer el valor en bruto del sensor de flujo
   const rawValue = flowSensor.value;
 
-  // Guardar los datos del sensor en MongoDB
-  const sensorData = new SensorData({
-    flow: rawValue,
-    createdAt: new Date(),
+  // Guardar los datos del sensor en la base de datos SQLite
+  db.run(`INSERT INTO SensorData(flow, createdAt) VALUES(?, ?)`, [rawValue, new Date()], function(err) {
+    if (err) {
+      return console.log(err.message);
+    }
   });
-  await sensorData.save();
 
   res.send({ flow: rawValue });
 });
 
 app.listen(3000, () => {
   console.log('Server is up on port 3000');
-  
 });
