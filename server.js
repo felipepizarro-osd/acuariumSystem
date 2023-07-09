@@ -73,7 +73,7 @@ board.on("ready", function() {
     //if (phTimeout) clearTimeout(phTimeout);
     phTimeout = setTimeout(() => {
       // Formatea el valor de pH para que siempre tenga 5 caracteres
-      let phString = phValue.toFixed(2);
+      let phString = phValue.toFixed(1);
       phString = ("     " + phString).slice(-5);  // Asegura 5 caracteres
       lcd.cursor(1, 0).print("pH  :" + phString + "    ");
     }, 5000); // // Update LCD after 10 seconds
