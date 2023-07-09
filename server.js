@@ -56,7 +56,7 @@ board.on("ready", function() {
       //console.log("Temp: " + temperatureValue); // log temperature value
 
       // Clear any existing timeouts and set a new one
-      //if (tempTimeout) clearTimeout(tempTimeout);
+      if (tempTimeout) clearTimeout(tempTimeout);
       tempTimeout = setTimeout(() => {
 
         // Formatea el valor de temperatura para que siempre tenga 5 caracteres
@@ -73,7 +73,7 @@ board.on("ready", function() {
     //console.log("pH: " + phValue); // log pH value
 
     // Clear any existing timeouts and set a new one
-    //if (phTimeout) clearTimeout(phTimeout);
+    if (phTimeout) clearTimeout(phTimeout);
     phTimeout = setTimeout(() => {
       // Formatea el valor de pH para que siempre tenga 5 caracteres
       let phString = phValue.toFixed(1);
