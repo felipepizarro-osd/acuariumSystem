@@ -29,6 +29,9 @@ let previousPhValue = null;
 
 board.on("ready", function() {
   console.log("firmata working");
+  const led1 = new five.Led(4);
+  const led2 = new five.Led(7);
+  led1.on();
   temperatureSensor = new five.Thermometer({
     controller: "DS18B20",
     pin: "2",
@@ -90,6 +93,7 @@ app.get('/api/temperature', async (req, res) => {
   });
 
   res.send({ temperature: temperatureSensor.celsius });
+  led2.blink(500);
 });
 
 // Función para convertir el valor en bruto del sensor de pH a un valor de pH real
@@ -125,6 +129,8 @@ app.get('/api/ph', async (req, res) => {
   });
 
   res.send({ ph: rawValue });
+  led2.blink(500);
+
 });
 
 app.get('/api/flow', async (req, res) => {
@@ -144,6 +150,8 @@ app.get('/api/flow', async (req, res) => {
   });
 
   res.send({ flow: rawValue });
+  led2.blink(500);
+
 });
 
 app.listen(3000, () => {
