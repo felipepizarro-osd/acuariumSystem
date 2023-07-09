@@ -25,13 +25,13 @@ let flowSensor;
 let lcd;
 let previousTemperatureValue = null;
 let previousPhValue = null;
-const led2 = new five.Led(7);
+let led2;
 
 
 board.on("ready", function() {
   console.log("firmata working");
   const led1 = new five.Led(4);
-  //const led2 = new five.Led(7);
+  const led2 = new five.Led(7);
   led1.on();
   temperatureSensor = new five.Thermometer({
     controller: "DS18B20",
@@ -151,7 +151,7 @@ app.get('/api/flow', async (req, res) => {
   });
 
   res.send({ flow: rawValue });
-  led2.blink(500);
+    led2.blink(500);
 
 });
 
