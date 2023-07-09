@@ -65,7 +65,7 @@ board.on("ready", function() {
 
         temperatureString = ("     " + temperatureString).slice(-5);  // Asegura 5 caracteres
         lcd.cursor(0, 0).print("Temp:" + temperatureString + " C  ");
-      }, 5000);
+      }, 20000);
     });
       // Monitor pH changes
   phSensor.on("data", function() {
@@ -80,7 +80,7 @@ board.on("ready", function() {
       console.log(phString)
       phString = ("     " + phString).slice(-5);  // Asegura 5 caracteres
       lcd.cursor(1, 0).print("pH  :" + phString + "    ");
-    }, 5000); // // Update LCD after 10 seconds
+    }, 20000); // // Update LCD after 10 seconds
   });
 
 });
