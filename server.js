@@ -23,8 +23,9 @@ let temperatureSensor;
 let phSensor;
 let flowSensor;
 let lcd;
-let lastTempWritten;
-let lastPhWritten;
+let previousTemperatureValue = null;
+let previousPhValue = null;
+
 
 board.on("ready", function() {
   console.log("firmata working");
@@ -53,23 +54,22 @@ board.on("ready", function() {
   temperatureSensor.on("change", function() {
     const temperatureValue = temperatureSensor.celsius.toFixed(1);
   
-    // Update LCD only if temperature value has changed
-    if (temperatureValue !== lastTempWritten) {
-      // Pad the temperature value to ensure it always has 5 characters
+    // Actualizar LCD solo si la temperatura ha cambiado más de 0.1 grados
+    if (previousTemperatureValue === null || Math.abs(temperatureValue - previousTemperatureValue) >= 0.1) {
+      // Asegúrate de que el valor de la temperatura siempre tenga 5 caracteres
       const temperatureString = ("     " + temperatureValue).slice(-5);
       lcd.cursor(0, 0).print("Temp:" + temperatureString + " C  ");
-      lastTempWritten = temperatureValue;
+      previousTemperatureValue = temperatureValue;
     }
   });
   phSensor.on("data", function() {
     const phValue = (this.value * (14.0 / 1023.0)).toFixed(1);
-  
-    // Update LCD only if pH value has changed
-    if (phValue !== lastPhWritten) {
-      // Pad the pH value to ensure it always has 5 characters
+    // Actualizar LCD solo si el valor de pH ha cambiado más de 0.1
+    if (previousPhValue === null || Math.abs(phValue - previousPhValue) >= 0.1) {
+      // Asegúrate de que el valor de pH siempre tenga 5 caracteres
       const phString = ("     " + phValue).slice(-5);
       lcd.cursor(1, 0).print("pH  :" + phString + "    ");
-      lastPhWritten = phValue;
+      previousPhValue = phValue;
     }
   })
 });
