@@ -31,8 +31,9 @@ let led2;
 board.on("ready", function() {
   console.log("firmata working");
   const led1 = new five.Led(4);
-  const led2 = new five.Led(7);
+  led2 = new five.Led(7);
   led1.on();
+  
   temperatureSensor = new five.Thermometer({
     controller: "DS18B20",
     pin: "2",
