@@ -52,11 +52,11 @@ board.on("ready", function() {
   });
     // Monitor temperature changes
     temperatureSensor.on("change", function() {
-      temperatureValue = temperatureSensor.celsius;
+      temperatureValue = temperatureSensor.celsius; 
       console.log("Temp: " + temperatureValue); // log temperature value
 
       // Clear any existing timeouts and set a new one
-      if (tempTimeout) clearTimeout(tempTimeout);
+      //if (tempTimeout) clearTimeout(tempTimeout);
       tempTimeout = setTimeout(() => {
         lcd.cursor(0, 5).print(temperatureValue + " C  ");
       }, 10000); // Update LCD after 10 seconds
@@ -67,7 +67,7 @@ board.on("ready", function() {
     console.log("pH: " + phValue); // log pH value
 
     // Clear any existing timeouts and set a new one
-    if (phTimeout) clearTimeout(phTimeout);
+    //if (phTimeout) clearTimeout(phTimeout);
     phTimeout = setTimeout(() => {
       lcd.cursor(1, 5).print(phValue.toFixed(2) + "     ");
     }, 10000); // Update LCD after 10 seconds
