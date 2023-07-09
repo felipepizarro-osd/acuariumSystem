@@ -56,16 +56,17 @@ board.on("ready", function() {
       //console.log("Temp: " + temperatureValue); // log temperature value
 
       // Clear any existing timeouts and set a new one
-      if (tempTimeout) clearTimeout(tempTimeout);
+      //if (tempTimeout) clearTimeout(tempTimeout);
       tempTimeout = setTimeout(() => {
 
         // Formatea el valor de temperatura para que siempre tenga 5 caracteres
         let temperatureString = temperatureValue.toFixed(1);
         console.log(temperatureString)
 
-        temperatureString = ("     " + temperatureString).slice(-5);  // Asegura 5 caracteres
-        lcd.cursor(0, 0).print("Temp:" + temperatureString + " C  ");
+        temperatureString = ("" + temperatureString).slice(-5);  // Asegura 5 caracteres
+        lcd.cursor(0, 0).print("Temp:" + temperatureString + "C");
       }, 20000);
+      clearTimeout(tempTimeout);
     });
       // Monitor pH changes
   phSensor.on("data", function() {
@@ -73,14 +74,16 @@ board.on("ready", function() {
     //console.log("pH: " + phValue); // log pH value
 
     // Clear any existing timeouts and set a new one
-    if (phTimeout) clearTimeout(phTimeout);
+    //if (phTimeout) clearTimeout(phTimeout);
     phTimeout = setTimeout(() => {
       // Formatea el valor de pH para que siempre tenga 5 caracteres
       let phString = phValue.toFixed(1);
       console.log(phString)
-      phString = ("     " + phString).slice(-5);  // Asegura 5 caracteres
-      lcd.cursor(1, 0).print("pH  :" + phString + "    ");
-    }, 20000); // // Update LCD after 10 seconds
+      phString = ("" + phString).slice(-5);  // Asegura 5 caracteres
+      lcd.cursor(1, 0).print("pH  :" + phString + "");
+    }, 20000);
+    clearTimeout(phTimeout);
+    // // Update LCD after 10 seconds
   });
 
 });
