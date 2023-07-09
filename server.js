@@ -96,6 +96,9 @@ app.get('/api/temperature', async (req, res) => {
 
   res.send({ temperature: temperatureSensor.celsius });
   led2.blink(500);
+  setTimeout(() => {
+    led2.stop().off();
+  }, 5000);
 });
 
 // Función para convertir el valor en bruto del sensor de pH a un valor de pH real
@@ -132,6 +135,9 @@ app.get('/api/ph', async (req, res) => {
 
   res.send({ ph: rawValue });
   led2.blink(500);
+  setTimeout(() => {
+    led2.stop().off();
+  }, 5000);
 
 });
 
@@ -152,7 +158,10 @@ app.get('/api/flow', async (req, res) => {
   });
 
   res.send({ flow: rawValue });
-    led2.blink(500);
+  led2.blink(500);
+  setTimeout(() => {
+    led2.stop().off();
+  }, 5000);
 
 });
 
