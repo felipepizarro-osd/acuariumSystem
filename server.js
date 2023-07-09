@@ -52,7 +52,8 @@ board.on("ready", function() {
   });
     // Monitor temperature changes
     temperatureSensor.on("change", function() {
-      temperatureValue = temperatureSensor.console.log("Temp: " + temperatureValue); // log temperature value
+      temperatureValue = temperatureSensor.celsius;
+      console.log("Temp: " + temperatureValue); // log temperature value
 
       // Clear any existing timeouts and set a new one
       if (tempTimeout) clearTimeout(tempTimeout);
