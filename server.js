@@ -23,8 +23,6 @@ let temperatureSensor;
 let phSensor;
 let flowSensor;
 let lcd;
-let tempTimeout;
-let phTimeout;
 let lastTempWritten;
 let lastPhWritten;
 
@@ -52,31 +50,29 @@ board.on("ready", function() {
     lcd.cursor(0, 0).print("pH value:");
     lcd.cursor(1, 0).print("Temp value:");
   });
-    // Monitor temperature changes
-    temperatureSensor.on("change", function() {
-      temperatureValue = temperatureSensor.celsius.toFixed(1); 
-      console.log("Temp: " + temperatureValue); // log temperature value
-      if (temperatureValue !== lastTempWritten) {
-        // Pad the temperature value to ensure it always has 5 characters
-        const temperatureString = ("     " + temperatureValue).slice(-5);
-        lcd.cursor(0, 0).print("Temp:" + temperatureString + " C  ");
-        lastTempWritten = temperatureValue;
-      }
-    });
-      // Monitor pH changes
+  temperatureSensor.on("change", function() {
+    const temperatureValue = temperatureSensor.celsius.toFixed(1);
+  
+    // Update LCD only if temperature value has changed
+    if (temperatureValue !== lastTempWritten) {
+      // Pad the temperature value to ensure it always has 5 characters
+      const temperatureString = ("     " + temperatureValue).slice(-5);
+      lcd.cursor(0, 0).print("Temp:" + temperatureString + " C  ");
+      lastTempWritten = temperatureValue;
+    }
+  });
   phSensor.on("data", function() {
-    phValue = (phSensor.value * (14.0 / 1023.0)).toFixed(1);
-    console.log("pH: " + phValue); // log pH value
+    const phValue = (this.value * (14.0 / 1023.0)).toFixed(1);
+  
     // Update LCD only if pH value has changed
     if (phValue !== lastPhWritten) {
       // Pad the pH value to ensure it always has 5 characters
       const phString = ("     " + phValue).slice(-5);
       lcd.cursor(1, 0).print("pH  :" + phString + "    ");
       lastPhWritten = phValue;
-  };
-
+    }
+  })
 });
-
 const app = express();
 app.use(bodyParser.json());
 
