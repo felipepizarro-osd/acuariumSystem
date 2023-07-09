@@ -61,7 +61,7 @@ board.on("ready", function() {
         // Formatea el valor de temperatura para que siempre tenga 5 caracteres
         let temperatureString = temperatureValue.toFixed(1);
         temperatureString = ("     " + temperatureString).slice(-5);  // Asegura 5 caracteres
-        lcd.cursor(0, 5).print(temperatureString + " C");
+        lcd.cursor(0, 0).print("Temp:" + temperatureString + " C  ");
       }, 5000);
     });
       // Monitor pH changes
@@ -75,7 +75,7 @@ board.on("ready", function() {
       // Formatea el valor de pH para que siempre tenga 5 caracteres
       let phString = phValue.toFixed(2);
       phString = ("     " + phString).slice(-5);  // Asegura 5 caracteres
-      lcd.cursor(1, 5).print(phString + "    ");
+      lcd.cursor(1, 0).print("pH  :" + phString + "    ");
     }, 5000); // // Update LCD after 10 seconds
   });
 
