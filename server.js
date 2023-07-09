@@ -23,6 +23,8 @@ let temperatureSensor;
 let phSensor;
 let flowSensor;
 let lcd;
+let tempTimeout;
+let phTimeout;
 
 board.on("ready", function() {
   console.log("firmata working");
@@ -50,15 +52,24 @@ board.on("ready", function() {
   });
     // Monitor temperature changes
     temperatureSensor.on("change", function() {
-      temperatureValue = temperatureSensor.celsius;
-      console.log("Temp: " + temperatureValue); // log temperature value
-      lcd.cursor(1, 11).print(temperatureValue + " C  ");
+      temperatureValue = temperatureSensor.console.log("Temp: " + temperatureValue); // log temperature value
+
+      // Clear any existing timeouts and set a new one
+      if (tempTimeout) clearTimeout(tempTimeout);
+      tempTimeout = setTimeout(() => {
+        lcd.cursor(0, 5).print(temperatureValue + " C  ");
+      }, 10000); // Update LCD after 10 seconds
     });
       // Monitor pH changes
   phSensor.on("data", function() {
     phValue = phSensor.value * (14.0 / 1023.0);
     console.log("pH: " + phValue); // log pH value
-    lcd.cursor(0, 9).print(phValue.toFixed(2) + "    ");
+
+    // Clear any existing timeouts and set a new one
+    if (phTimeout) clearTimeout(phTimeout);
+    phTimeout = setTimeout(() => {
+      lcd.cursor(1, 5).print(phValue.toFixed(2) + "     ");
+    }, 10000); // Update LCD after 10 seconds
   });
 
 });
