@@ -59,7 +59,7 @@ board.on("ready", function() {
       //if (tempTimeout) clearTimeout(tempTimeout);
       tempTimeout = setTimeout(() => {
         lcd.cursor(0, 5).print(temperatureValue + " C  ");
-      }, 10000); // Update LCD after 10 seconds
+      }, 5000); // Update LCD after 10 seconds
     });
       // Monitor pH changes
   phSensor.on("data", function() {
@@ -70,7 +70,7 @@ board.on("ready", function() {
     //if (phTimeout) clearTimeout(phTimeout);
     phTimeout = setTimeout(() => {
       lcd.cursor(1, 5).print(phValue.toFixed(2) + "     ");
-    }, 10000); // Update LCD after 10 seconds
+    }, 5000); // Update LCD after 10 seconds
   });
 
 });
