@@ -25,6 +25,8 @@ let flowSensor;
 let lcd;
 let tempTimeout;
 let phTimeout;
+let lastTempWritten;
+let lastPhWritten;
 
 board.on("ready", function() {
   console.log("firmata working");
@@ -52,37 +54,25 @@ board.on("ready", function() {
   });
     // Monitor temperature changes
     temperatureSensor.on("change", function() {
-      temperatureValue = temperatureSensor.celsius; 
-      //console.log("Temp: " + temperatureValue); // log temperature value
-
-      // Clear any existing timeouts and set a new one
-      //if (tempTimeout) clearTimeout(tempTimeout);
-      tempTimeout = setTimeout(() => {
-
-        // Formatea el valor de temperatura para que siempre tenga 5 caracteres
-        let temperatureString = temperatureValue.toFixed(1);
-        console.log(temperatureString)
-
-        temperatureString = ("" + temperatureString).slice(-5);  // Asegura 5 caracteres
-        lcd.cursor(0, 0).print("Temp:" + temperatureString + "C");
-      }, 5000);
+      temperatureValue = temperatureSensor.celsius.toFixed(1); 
+      console.log("Temp: " + temperatureValue); // log temperature value
+      if (temperatureValue !== lastTempWritten) {
+        // Pad the temperature value to ensure it always has 5 characters
+        const temperatureString = ("     " + temperatureValue).slice(-5);
+        lcd.cursor(0, 0).print("Temp:" + temperatureString + " C  ");
+        lastTempWritten = temperatureValue;
+      }
     });
       // Monitor pH changes
   phSensor.on("data", function() {
-    phValue = phSensor.value * (14.0 / 1023.0);
-    //console.log("pH: " + phValue); // log pH value
-
-    // Clear any existing timeouts and set a new one
-    //if (phTimeout) clearTimeout(phTimeout);
-    phTimeout = setTimeout(() => {
-      // Formatea el valor de pH para que siempre tenga 5 caracteres
-      let phString = phValue.toFixed(1);
-      console.log(phString)
-      phString = ("" + phString).slice(-5);  // Asegura 5 caracteres
-      lcd.cursor(1, 0).print("pH  :" + phString + "");
-    }, 5000);
-    
-    // // Update LCD after 10 seconds
+    phValue = (phSensor.value * (14.0 / 1023.0)).toFixed(1);
+    console.log("pH: " + phValue); // log pH value
+    // Update LCD only if pH value has changed
+    if (phValue !== lastPhWritten) {
+      // Pad the pH value to ensure it always has 5 characters
+      const phString = ("     " + phValue).slice(-5);
+      lcd.cursor(1, 0).print("pH  :" + phString + "    ");
+      lastPhWritten = phValue;
   });
 
 });
