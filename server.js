@@ -22,6 +22,7 @@ db.run(`CREATE TABLE IF NOT EXISTS SensorData (
 let temperatureSensor;
 let phSensor;
 let flowSensor;
+let lcd;
 
 board.on("ready", function() {
   console.log("firmata working");
