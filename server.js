@@ -60,7 +60,7 @@ board.on("ready", function() {
     lcd.cursor(1, 0).print(`pH: ${rawPhValue}`);
 
     // Guardar los datos del sensor en SQLite
-    const sensorData = { temperature: temperature, ph: rawPhValue, createdAt: new Date() };
+    const sensorData = { temperature: temperature, ph: rawPhValue, createdAt: Math.floor(new Date().getTime() / 1000) };
     db.run(`INSERT INTO SensorData(temperature, ph, createdAt) VALUES(${sensorData.temperature}, ${sensorData.ph}, ${sensorData.createdAt})`);
 
   }, 10000);
