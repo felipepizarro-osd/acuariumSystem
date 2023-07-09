@@ -43,28 +43,24 @@ board.on("ready", function() {
     rows: 2,
     cols: 16
   });
+  lcd.on("ready", function() {
+    console.log("LCD ready");
+    lcd.cursor(0, 0).print("pH value:");
+    lcd.cursor(1, 0).print("Temp value:");
+  });
+    // Monitor temperature changes
+    temperatureSensor.on("change", function() {
+      temperatureValue = temperatureSensor.celsius;
+      console.log("Temp: " + temperatureValue); // log temperature value
+      lcd.cursor(1, 11).print(temperatureValue + " C  ");
+    });
+      // Monitor pH changes
+  phSensor.on("data", function() {
+    phValue = phSensor.value * (14.0 / 1023.0);
+    console.log("pH: " + phValue); // log pH value
+    lcd.cursor(0, 9).print(phValue.toFixed(2) + "    ");
+  });
 
-  setInterval(async () => {
-    if (!temperatureSensor || !phSensor || !lcd) {
-      console.log("Sensors not ready yet");
-      return;
-    }
-    console.log("pantalla inicializada");
-    // Leer el valor en bruto del sensor de pH
-    const rawPhValue = phSensor.value * (14.0/1023.0);
-
-    // Leer la temperatura
-    const temperature = temperatureSensor.celsius;
-
-    // Actualizar la pantalla LCD
-    lcd.clear().cursor(0, 0).print(`Temp: ${temperature}`);
-    lcd.cursor(1, 0).print(`pH: ${rawPhValue}`);
-
-    // Guardar los datos del sensor en SQLite
-    const sensorData = { temperature: temperature, ph: rawPhValue, createdAt: Math.floor(new Date().getTime() / 1000) };
-    db.run(`INSERT INTO SensorData(temperature, ph, createdAt) VALUES(${sensorData.temperature}, ${sensorData.ph}, ${sensorData.createdAt})`);
-
-  }, 10000);
 });
 
 const app = express();
