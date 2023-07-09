@@ -36,6 +36,34 @@ board.on("ready", function() {
   });
 
   flowSensor = new five.Sensor.Digital(3); // Suponiendo que el sensor está en el pin 3.
+  lcd = new five.LCD({
+    pins: [13, 12, 11, 10, 9, 8], // Actualización de los pines según tu configuración
+    backlight: 6,
+    rows: 2,
+    cols: 16
+  });
+
+  setInterval(async () => {
+    if (!temperatureSensor || !phSensor || !lcd) {
+      console.log("Sensors not ready yet");
+      return;
+    }
+
+    // Leer el valor en bruto del sensor de pH
+    const rawPhValue = phSensor.value * (14.0/1023.0);
+
+    // Leer la temperatura
+    const temperature = temperatureSensor.celsius;
+
+    // Actualizar la pantalla LCD
+    lcd.clear().cursor(0, 0).print(`Temp: ${temperature}`);
+    lcd.cursor(1, 0).print(`pH: ${rawPhValue}`);
+
+    // Guardar los datos del sensor en SQLite
+    const sensorData = { temperature: temperature, ph: rawPhValue, createdAt: new Date() };
+    db.run(`INSERT INTO SensorData(temperature, ph, createdAt) VALUES(${sensorData.temperature}, ${sensorData.ph}, ${sensorData.createdAt})`);
+
+  }, 10000);
 });
 
 const app = express();
