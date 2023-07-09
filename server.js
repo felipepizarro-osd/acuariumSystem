@@ -49,7 +49,7 @@ board.on("ready", function() {
       console.log("Sensors not ready yet");
       return;
     }
-
+    console.log("pantalla inicializada");
     // Leer el valor en bruto del sensor de pH
     const rawPhValue = phSensor.value * (14.0/1023.0);
 
