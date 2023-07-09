@@ -73,7 +73,7 @@ board.on("ready", function() {
       const phString = ("     " + phValue).slice(-5);
       lcd.cursor(1, 0).print("pH  :" + phString + "    ");
       lastPhWritten = phValue;
-  });
+  };
 
 });
 
