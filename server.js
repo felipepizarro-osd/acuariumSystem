@@ -164,6 +164,28 @@ app.get('/api/flow', async (req, res) => {
   }, 5000);
 
 });
+app.get('/api/latest-records', async (req, res) => {
+  let limit = req.query.limit; // La cantidad de registros que quieres obtener.
+  if(!limit) limit = 10; // Un valor por defecto si no se especifica 'limit' en la petición.
+
+  // Consulta SQLite para obtener los últimos registros
+  let sql = `SELECT * FROM SensorData ORDER BY createdAt DESC LIMIT ?`;
+
+  db.all(sql, [limit], (err, rows) => {
+    if (err) {
+      res.status(400).json({"error":err.message});
+      return;
+    }
+    res.json({
+        "message":"success",
+        "data":rows
+    })
+    led2.blink(500);
+    setTimeout(() => {
+      led2.stop().off();
+    }, 5000);
+  });
+});
 
 app.listen(3000, () => {
   console.log('Server is up on port 3000');
