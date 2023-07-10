@@ -80,7 +80,10 @@ board.on("ready", function() {
 });
 const app = express();
 app.use(bodyParser.json());
-
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*') // permite solicitudes de cualquier origen
+  next()
+})
 app.get('/api/temperature', async (req, res) => {
   if (!temperatureSensor) {
     res.status(500).send("Board not ready yet");
