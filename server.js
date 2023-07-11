@@ -19,6 +19,13 @@ db.run(`CREATE TABLE IF NOT EXISTS SensorData (
   createdAt TEXT
 )`);
 
+var corsOptions = {
+  origin: 'http://localhost:3000', // cambia esto al puerto donde se ejecuta tu aplicación
+  optionsSuccessStatus: 200,
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  credentials: true
+};
+
 let temperatureSensor;
 let phSensor;
 let flowSensor;
@@ -86,7 +93,7 @@ app.use(bodyParser.json());
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization'); // permite solicitudes de cualquier origen
   next()
 })*/
-app.use(cors());
+app.use(cors(corsOptions));
 app.get('/api/temperature', async (req, res) => {
   if (!temperatureSensor) {
     res.status(500).send("Board not ready yet");
