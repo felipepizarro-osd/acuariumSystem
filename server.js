@@ -3,7 +3,7 @@ const bodyParser = require('body-parser');
 const sqlite3 = require('sqlite3').verbose();
 const five = require("johnny-five");
 const board = new five.Board();
-
+const cors = require('cors');
 let db = new sqlite3.Database('./arduinoData.db', sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE, (err) => {
   if (err) {
     console.error(err.message);
@@ -80,12 +80,13 @@ board.on("ready", function() {
 });
 const app = express();
 app.use(bodyParser.json());
-app.use((req, res, next) => {
+/*app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*')
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization'); // permite solicitudes de cualquier origen
   next()
-})
+})*/
+app.use(cors());
 app.get('/api/temperature', async (req, res) => {
   if (!temperatureSensor) {
     res.status(500).send("Board not ready yet");
