@@ -93,7 +93,7 @@ app.use(bodyParser.json());
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization'); // permite solicitudes de cualquier origen
   next()
 })*/
-app.use(cors(corsOptions));
+app.use(cors());
 app.get('/api/temperature', async (req, res) => {
   
   if (!temperatureSensor) {
