@@ -4,6 +4,12 @@ const sqlite3 = require('sqlite3').verbose();
 const five = require("johnny-five");
 const board = new five.Board();
 const cors = require('cors');
+
+const app = express();
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
+app.use(cors(corsOptions));
+
 let db = new sqlite3.Database('./arduinoData.db', sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE, (err) => {
   if (err) {
     console.error(err.message);
@@ -17,7 +23,13 @@ db.run(`CREATE TABLE IF NOT EXISTS SensorData (
   ph REAL,
   flow INTEGER,
   createdAt TEXT
-)`);
+)`, function(err) {
+  if (err) {
+    return console.error('Error creating table:', err);
+  }
+  console.log('Table created successfully');
+});
+
 
 var corsOptions = {
   origin: 'http://localhost:3000', // cambia esto al puerto donde se ejecuta tu aplicación
@@ -85,15 +97,8 @@ board.on("ready", function() {
     }
   })
 });
-const app = express();
-app.use(bodyParser.json());
-/*app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*')
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization'); // permite solicitudes de cualquier origen
-  next()
-})*/
-app.use(cors(corsOptions));
+
+
 app.get('/api/temperature', async (req, res) => {
   
   if (!temperatureSensor) {
@@ -102,11 +107,11 @@ app.get('/api/temperature', async (req, res) => {
   }
 
   // Guardar los datos del sensor en la base de datos SQLite
-  db.run(`INSERT INTO SensorData(temperature, createdAt) VALUES(?, ?)`, [temperatureSensor.celsius, new Date()], function(err) {
+  /*db.run(`INSERT INTO SensorData(temperature, createdAt) VALUES(?, ?)`, [temperatureSensor.celsius, new Date()], function(err) {
     if (err) {
       return console.log(err.message);
     }
-  });
+  });*/
 
   res.send({ temperature: temperatureSensor.celsius });
   led2.blink(500);
@@ -141,11 +146,11 @@ app.get('/api/ph', async (req, res) => {
   const rawValue = phSensor.value * (14.0/1023.0);
 
   // Guardar los datos del sensor en la base de datos SQLite
-  db.run(`INSERT INTO SensorData(ph, createdAt) VALUES(?, ?)`, [rawValue, new Date()], function(err) {
+  /*db.run(`INSERT INTO SensorData(ph, createdAt) VALUES(?, ?)`, [rawValue, new Date()], function(err) {
     if (err) {
       return console.log(err.message);
     }
-  });
+  });*/
 
   res.send({ ph: rawValue });
   led2.blink(500);
@@ -165,11 +170,11 @@ app.get('/api/flow', async (req, res) => {
   const rawValue = flowSensor.value;
 
   // Guardar los datos del sensor en la base de datos SQLite
-  db.run(`INSERT INTO SensorData(flow, createdAt) VALUES(?, ?)`, [rawValue, new Date()], function(err) {
+  /*db.run(`INSERT INTO SensorData(flow, createdAt) VALUES(?, ?)`, [rawValue, new Date()], function(err) {
     if (err) {
       return console.log(err.message);
     }
-  });
+  });*/
 
   res.send({ flow: rawValue });
   led2.blink(500);
