@@ -29,7 +29,16 @@ db.run(`CREATE TABLE IF NOT EXISTS SensorData (
   }
   console.log('Table created successfully');
 });
+function saveSensorData(temperature, ph, flow) {
+  let query = `INSERT INTO SensorData(temperature, ph, flow, createdAt) VALUES(?, ?, ?, datetime('now'))`;
 
+  db.run(query, [temperature, ph, flow], function(err) {
+    if (err) {
+      return console.error('Error saving data:', err);
+    }
+    console.log('Data saved successfully');
+  });
+}
 
 var corsOptions = {
   origin: 'http://localhost:3000', // cambia esto al puerto donde se ejecuta tu aplicación
@@ -84,6 +93,9 @@ board.on("ready", function() {
       const temperatureString = ("     " + temperatureValue).slice(0);
       lcd.cursor(0, 0).print("Temp:" + temperatureString + " C  ");
       previousTemperatureValue = temperatureValue;
+
+      // Guardar los datos de los sensores en la base de datos
+      saveSensorData(temperatureValue, previousPhValue, 200);
     }
   });
   phSensor.on("data", function() {
@@ -94,8 +106,11 @@ board.on("ready", function() {
       const phString = ("     " + phValue).slice(0);
       lcd.cursor(1, 0).print("pH  :" + phString + "    ");
       previousPhValue = phValue;
+      // Guardar los datos de los sensores en la base de datos
+      saveSensorData(previousTemperatureValue, phValue, 200);
     }
   })
+
 });
 
 
