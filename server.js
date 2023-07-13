@@ -36,7 +36,7 @@ function saveSensorData(temperature, ph, flow) {
     if (err) {
       return console.error('Error saving data:', err);
     }
-    console.log('Data saved successfully');
+    //console.log('Data saved successfully');
   });
 }
 
