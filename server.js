@@ -61,7 +61,11 @@ function saveSensorData(temperature, ph, flow) {
     if (err) {
       return console.error("Error saving data:", err);
     }
-    console.log("Data saved successfully");
+    //console.log("Data saved successfully");
+    led1.blink(100);
+    setTimeout(() => {
+      led1.stop().off();
+    }, 9000);
   });
 }
 
@@ -114,7 +118,7 @@ board.on("ready", function () {
     // Actualizar LCD solo si la temperatura ha cambiado más de 0.1 grados
     if (
       previousTemperatureValue === null ||
-      Math.abs(temperatureValue - previousTemperatureValue) >= 0.1
+      Math.abs(temperatureValue - previousTemperatureValue) >= 2.0
     ) {
       // Asegúrate de que el valor de la temperatura siempre tenga 5 caracteres
       const temperatureString = ("     " + temperatureValue).slice(0);
@@ -130,7 +134,7 @@ board.on("ready", function () {
     // Actualizar LCD solo si el valor de pH ha cambiado más de 0.1
     if (
       previousPhValue === null ||
-      Math.abs(phValue - previousPhValue) >= 0.1
+      Math.abs(phValue - previousPhValue) >= 1
     ) {
       // Asegúrate de que el valor de pH siempre tenga 5 caracteres
       const phString = ("     " + phValue).slice(0);
