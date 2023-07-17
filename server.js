@@ -88,7 +88,7 @@ board.on("ready", function () {
   led2 = new five.Led(7);
   led1.on();
   servo = new five.Servo.Continuous(5);
-
+  servo.to(90);  // En lugar de servo.stop();
   board.repl.inject({
     servo
   });
@@ -160,7 +160,7 @@ function moveServo() {
 
   // Volver a la posición inicial después de un retardo
   setTimeout(() => {
-    servo.stop(); 
+    servo.to(90);  // En lugar de servo.stop();; 
   }, 2000);
 }
 
