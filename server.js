@@ -87,7 +87,7 @@ board.on("ready", function () {
   const led1 = new five.Led(4);
   led2 = new five.Led(7);
   led1.on();
-  servo = new five.Servo(5);
+  servo = new five.Servo.Continuous(5);
 
   board.repl.inject({
     servo
