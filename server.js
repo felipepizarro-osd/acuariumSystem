@@ -1,50 +1,74 @@
-const express = require('express');
-const bodyParser = require('body-parser');
-const sqlite3 = require('sqlite3').verbose();
+const express = require("express");
+const bodyParser = require("body-parser");
+const sqlite3 = require("sqlite3").verbose();
 const five = require("johnny-five");
 const board = new five.Board();
-const cors = require('cors');
-
+const cors = require("cors");
+var db;
 const app = express();
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(cors(corsOptions));
 
-let db = new sqlite3.Database('./arduinoData.db', sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE, (err) => {
-  if (err) {
-    console.error(err.message);
+new sqlite3.Database("./arduinoData.db", sqlite3.OPEN_READWRITE, (err) => {
+  if (err && err.code == "SQLITE_CANTOPEN") {
+    createDatabase();
+    return;
+  } else if (err) {
+    console.log("Getting error " + err);
+    exit(1);
   }
-  console.log('Connected to the arduinoData database.');
+  //modifi
+  runQueries(db);
 });
-
-db.run(`CREATE TABLE IF NOT EXISTS SensorData (
+function createDatabase() {
+  let newdb = new sqlite3.Database(
+    "./arduinoData.db",
+    sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE,
+    (err) => {
+      if (err) {
+        console.error(err.message);
+        exit(1);
+      }
+      console.log("Connected to the arduinoData database.");
+      createTables(newdb);
+    }
+  );
+}
+function createTables(newdb) {
+  newdb.exec(
+    `CREATE TABLE IF NOT EXISTS SensorData (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   temperature REAL,
   ph REAL,
   flow INTEGER,
   createdAt TEXT
-)`, function(err) {
-  if (err) {
-    return console.error('Error creating table:', err);
-  }
-  console.log('Table created successfully');
-});
+)`,
+    function (err) {
+      if (err) {
+        return console.error("Error creating table:", err);
+      }
+      console.log("Table created successfully");
+      db = newdb;
+    }
+  );
+}
 function saveSensorData(temperature, ph, flow) {
   let query = `INSERT INTO SensorData(temperature, ph, flow, createdAt) VALUES(?, ?, ?, datetime('now'))`;
 
-  db.run(query, [temperature, ph, flow], function(err) {
+  db.run(query, [temperature, ph, flow], function (err) {
     if (err) {
-      return console.error('Error saving data:', err);
+      return console.error("Error saving data:", err);
     }
-    console.log('Data saved successfully');
+    console.log("Data saved successfully");
   });
 }
 
 var corsOptions = {
-  origin: 'http://localhost:3000', // cambia esto al puerto donde se ejecuta tu aplicación
+  origin: "http://localhost:3000", // cambia esto al puerto donde se ejecuta tu aplicación
   optionsSuccessStatus: 200,
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-  credentials: true
+  credentials: true,
 };
 
 let temperatureSensor;
@@ -55,18 +79,17 @@ let previousTemperatureValue = null;
 let previousPhValue = null;
 let led2;
 
-
-board.on("ready", function() {
+board.on("ready", function () {
   console.log("firmata working");
   const led1 = new five.Led(4);
   led2 = new five.Led(7);
   led1.on();
-  
+
   temperatureSensor = new five.Thermometer({
     controller: "DS18B20",
     pin: "2",
   });
-  
+
   phSensor = new five.Sensor({
     pin: "A0",
     freq: 1000,
@@ -77,18 +100,21 @@ board.on("ready", function() {
     pins: [13, 12, 11, 10, 9, 8], // Actualización de los pines según tu configuración
     backlight: 6,
     rows: 2,
-    cols: 16
+    cols: 16,
   });
-  lcd.on("ready", function() {
+  lcd.on("ready", function () {
     console.log("LCD ready");
     lcd.cursor(0, 0).print("pH value:");
     lcd.cursor(1, 0).print("Temp value:");
   });
-  temperatureSensor.on("change", function() {
+  temperatureSensor.on("change", function () {
     const temperatureValue = temperatureSensor.celsius.toFixed(1);
-  
+
     // Actualizar LCD solo si la temperatura ha cambiado más de 0.1 grados
-    if (previousTemperatureValue === null || Math.abs(temperatureValue - previousTemperatureValue) >= 0.1) {
+    if (
+      previousTemperatureValue === null ||
+      Math.abs(temperatureValue - previousTemperatureValue) >= 0.1
+    ) {
       // Asegúrate de que el valor de la temperatura siempre tenga 5 caracteres
       const temperatureString = ("     " + temperatureValue).slice(0);
       lcd.cursor(0, 0).print("Temp:" + temperatureString + " C  ");
@@ -98,10 +124,13 @@ board.on("ready", function() {
       saveSensorData(temperatureValue, previousPhValue, 200);
     }
   });
-  phSensor.on("data", function() {
+  phSensor.on("data", function () {
     const phValue = (this.value * (14.0 / 1023.0)).toFixed(1);
     // Actualizar LCD solo si el valor de pH ha cambiado más de 0.1
-    if (previousPhValue === null || Math.abs(phValue - previousPhValue) >= 0.1) {
+    if (
+      previousPhValue === null ||
+      Math.abs(phValue - previousPhValue) >= 0.1
+    ) {
       // Asegúrate de que el valor de pH siempre tenga 5 caracteres
       const phString = ("     " + phValue).slice(0);
       lcd.cursor(1, 0).print("pH  :" + phString + "    ");
@@ -109,13 +138,10 @@ board.on("ready", function() {
       // Guardar los datos de los sensores en la base de datos
       saveSensorData(previousTemperatureValue, phValue, 200);
     }
-  })
-
+  });
 });
 
-
-app.get('/api/temperature', async (req, res) => {
-  
+app.get("/api/temperature", async (req, res) => {
   if (!temperatureSensor) {
     res.status(500).send("Board not ready yet");
     return;
@@ -139,11 +165,13 @@ app.get('/api/temperature', async (req, res) => {
 function convertToPH(sensorValue) {
   // Valores de referencia de calibración
   const referenceValues = {
-    pH7: 7.0,  // Lectura del sensor a pH 7.0
-    pH4: 4.0,  // Lectura del sensor a pH 4.0
+    pH7: 7.0, // Lectura del sensor a pH 7.0
+    pH4: 4.0, // Lectura del sensor a pH 4.0
   };
 
-  const m = (referenceValues.pH7 - referenceValues.pH4) / (sensorValue.pH7 - sensorValue.pH4);
+  const m =
+    (referenceValues.pH7 - referenceValues.pH4) /
+    (sensorValue.pH7 - sensorValue.pH4);
   const b = referenceValues.pH7 - m * sensorValue.pH7;
 
   const pHValue = m * sensorValue + b;
@@ -151,14 +179,14 @@ function convertToPH(sensorValue) {
   return pHValue;
 }
 
-app.get('/api/ph', async (req, res) => {
+app.get("/api/ph", async (req, res) => {
   if (!phSensor) {
-    res.status(500).send('Board not ready yet');
+    res.status(500).send("Board not ready yet");
     return;
   }
 
   // Leer el valor en bruto del sensor de pH
-  const rawValue = phSensor.value * (14.0/1023.0);
+  const rawValue = phSensor.value * (14.0 / 1023.0);
 
   // Guardar los datos del sensor en la base de datos SQLite
   /*db.run(`INSERT INTO SensorData(ph, createdAt) VALUES(?, ?)`, [rawValue, new Date()], function(err) {
@@ -172,12 +200,11 @@ app.get('/api/ph', async (req, res) => {
   setTimeout(() => {
     led2.stop().off();
   }, 5000);
-
 });
 
-app.get('/api/flow', async (req, res) => {
+app.get("/api/flow", async (req, res) => {
   if (!flowSensor) {
-    res.status(500).send('Board not ready yet');
+    res.status(500).send("Board not ready yet");
     return;
   }
 
@@ -196,24 +223,23 @@ app.get('/api/flow', async (req, res) => {
   setTimeout(() => {
     led2.stop().off();
   }, 5000);
-
 });
-app.get('/api/latest-records', async (req, res) => {
+app.get("/api/latest-records", async (req, res) => {
   let limit = req.query.limit; // La cantidad de registros que quieres obtener.
-  if(!limit) limit = 10; // Un valor por defecto si no se especifica 'limit' en la petición.
+  if (!limit) limit = 10; // Un valor por defecto si no se especifica 'limit' en la petición.
 
   // Consulta SQLite para obtener los últimos registros
   let sql = `SELECT * FROM SensorData ORDER BY createdAt DESC LIMIT ?`;
 
   db.all(sql, [limit], (err, rows) => {
     if (err) {
-      res.status(400).json({"error":err.message});
+      res.status(400).json({ error: err.message });
       return;
     }
     res.json({
-        "message":"success",
-        "data":rows
-    })
+      message: "success",
+      data: rows,
+    });
     led2.blink(500);
     setTimeout(() => {
       led2.stop().off();
@@ -222,5 +248,5 @@ app.get('/api/latest-records', async (req, res) => {
 });
 
 app.listen(3000, () => {
-  console.log('Server is up on port 3000');
+  console.log("Server is up on port 3000");
 });
