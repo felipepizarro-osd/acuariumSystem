@@ -62,10 +62,7 @@ function saveSensorData(temperature, ph, flow) {
       return console.error("Error saving data:", err);
     }
     //console.log("Data saved successfully");
-    led1.blink(100);
-    setTimeout(() => {
-      led1.stop().off();
-    }, 9000);
+     
   });
 }
 
