@@ -88,7 +88,7 @@ board.on("ready", function () {
   led2 = new five.Led(7);
   led1.on();
   servo = new five.Servo.Continuous(5);
-  servo.to(90);  // En lugar de servo.stop();
+  servo.to(88);  // En lugar de servo.stop();
   board.repl.inject({
     servo
   });
@@ -154,13 +154,13 @@ function moveServo() {
     console.log("Servo no está inicializado.");
     return;
   }
-
+  console.log("moviendo dispensador ...");
   // Mover el servo a la posición máxima
   servo.cw(1); 
 
   // Volver a la posición inicial después de un retardo
   setTimeout(() => {
-    servo.to(90);  // En lugar de servo.stop();; 
+    servo.to(88);  // En lugar de servo.stop();; 
   }, 2000);
 }
 
