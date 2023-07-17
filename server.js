@@ -8,7 +8,7 @@ var db;
 const app = express();
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
-app.use(cors(corsOptions));
+app.use(cors());
 
 db = new sqlite3.Database("./arduinoData.db", sqlite3.OPEN_READWRITE, (err) => {
   if (err && err.code == "SQLITE_CANTOPEN") {
@@ -20,6 +20,7 @@ db = new sqlite3.Database("./arduinoData.db", sqlite3.OPEN_READWRITE, (err) => {
   }
   //modifi
   //runQueries(db);
+  console.log('base de datos conectada');
 });
 function createDatabase() {
   let newdb = new sqlite3.Database(
