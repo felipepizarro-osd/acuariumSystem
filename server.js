@@ -10,7 +10,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(cors(corsOptions));
 
-new sqlite3.Database("./arduinoData.db", sqlite3.OPEN_READWRITE, (err) => {
+db = new sqlite3.Database("./arduinoData.db", sqlite3.OPEN_READWRITE, (err) => {
   if (err && err.code == "SQLITE_CANTOPEN") {
     createDatabase();
     return;
@@ -19,7 +19,7 @@ new sqlite3.Database("./arduinoData.db", sqlite3.OPEN_READWRITE, (err) => {
     exit(1);
   }
   //modifi
-  runQueries(db);
+  //runQueries(db);
 });
 function createDatabase() {
   let newdb = new sqlite3.Database(
