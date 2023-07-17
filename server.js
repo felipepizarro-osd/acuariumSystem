@@ -88,7 +88,7 @@ board.on("ready", function () {
   led2 = new five.Led(7);
   led1.on();
   board.repl.inject({
-    servo;
+    servo
   });
   temperatureSensor = new five.Thermometer({
     controller: "DS18B20",
