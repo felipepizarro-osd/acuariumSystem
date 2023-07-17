@@ -4,6 +4,7 @@ const sqlite3 = require("sqlite3").verbose();
 const five = require("johnny-five");
 const board = new five.Board();
 const cors = require("cors");
+const servo = new five.Servo(5);
 var db;
 const app = express();
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -86,7 +87,9 @@ board.on("ready", function () {
   const led1 = new five.Led(4);
   led2 = new five.Led(7);
   led1.on();
-
+  board.repl.inject({
+    servo;
+  });
   temperatureSensor = new five.Thermometer({
     controller: "DS18B20",
     pin: "2",
@@ -142,7 +145,18 @@ board.on("ready", function () {
     }
   });
 });
+// Definir la función de movimiento del servo
+function moveServo() {
+  servo.max(); // Mover el servo a la posición máxima (una vuelta completa)
+  setTimeout(() => {
+    servo.stop(); // Detener el servo después de un tiempo (puedes ajustar este tiempo según tus necesidades)
+  }, 2000); // Detener después de 2 segundos (ejemplo, puedes ajustarlo)
+}
 
+app.get("/api/food",async (req.res)=>{
+  moveServo();
+  res.json({ message: "Movimiento del servo iniciado" });
+})
 app.get("/api/temperature", async (req, res) => {
   if (!temperatureSensor) {
     res.status(500).send("Board not ready yet");
