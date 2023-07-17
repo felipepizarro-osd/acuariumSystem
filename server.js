@@ -153,7 +153,7 @@ function moveServo() {
   }, 2000); // Detener después de 2 segundos (ejemplo, puedes ajustarlo)
 }
 
-app.get("/api/food",async (req.res)=>{
+app.get("/api/food",async (req,res)=>{
   moveServo();
   res.json({ message: "Movimiento del servo iniciado" });
 })
