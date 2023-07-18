@@ -160,8 +160,8 @@ function moveServo() {
 
   // Volver a la posición inicial después de un retardo
   setTimeout(() => {
-    servo.to(88);  // En lugar de servo.stop();; 
-  }, 1500);
+    servo.stop();  // En lugar de servo.stop();; 
+  }, 2000);
 }
 
 app.get("/api/food",async (req,res)=>{
