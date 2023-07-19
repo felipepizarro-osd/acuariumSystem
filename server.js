@@ -106,7 +106,7 @@ board.on("ready", function () {
 
   flowSensor = new five.Sensor.Digital(3); // Suponiendo que el sensor está en el pin 3.
   lcd = new five.LCD({
-    controller: "PCF8574" // Este es un controlador común de I2C, verifica si es el correcto para tu hardware
+    controller: "PCF8574T" // Este es un controlador común de I2C, verifica si es el correcto para tu hardware
   });
   lcd.on("ready", function () {
     console.log("LCD ready");
