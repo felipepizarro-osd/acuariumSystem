@@ -88,7 +88,13 @@ board.on("ready", function () {
   const led1 = new five.Led(4);
   led2 = new five.Led(7);
   led1.on();
-  servo = new five.Servo.Continuous(5);
+  servo = new five.Servo.Continuous({
+    pin: 9, // Cambiado a pin 9
+    startAt: 0, // Puede ajustar la posición inicial del servo.
+    range: [0, 180], // Este es el rango máximo en grados.
+    fps: 100, // Esto limita la velocidad de actualización a 100Hz para reducir el jittering.
+    invert: false // Puede invertir las direcciones si es necesario.
+  });
   servo.stop();  // En lugar de servo.stop();
   board.repl.inject({
     servo
