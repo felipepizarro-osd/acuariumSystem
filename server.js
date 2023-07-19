@@ -81,6 +81,7 @@ let previousTemperatureValue = null;
 let previousPhValue = null;
 let led2;
 let servo;
+let previousFlowValue = null;
 
 board.on("ready", function () {
   console.log("firmata working");
@@ -88,7 +89,7 @@ board.on("ready", function () {
   led2 = new five.Led(7);
   led1.on();
   servo = new five.Servo.Continuous(5);
-  servo.to(88);  // En lugar de servo.stop();
+  servo.stop();  // En lugar de servo.stop();
   board.repl.inject({
     servo
   });
@@ -129,7 +130,7 @@ board.on("ready", function () {
       previousTemperatureValue = temperatureValue;
 
       // Guardar los datos de los sensores en la base de datos
-      saveSensorData(temperatureValue, previousPhValue, 200);
+      saveSensorData(temperatureValue, previousPhValue, previousFlowValue);
     }
   });
   phSensor.on("data", function () {
@@ -144,9 +145,21 @@ board.on("ready", function () {
       lcd.cursor(1, 0).print("pH  :" + phString + "    ");
       previousPhValue = phValue;
       // Guardar los datos de los sensores en la base de datos
-      saveSensorData(previousTemperatureValue, phValue, 200);
+      saveSensorData(previousTemperatureValue, phValue, previousFlowValue);
     }
   });
+  // Agregar un listener para el sensor de flujo
+  flowSensor.on("change", function() {
+    const flowValue = this.value; // Dependiendo del sensor puede necesitar una conversión o ajuste similar al pH y la temperatura
+
+    if (previousFlowValue === null || Math.abs(flowValue - previousFlowValue) >= 1) { // Ajusta el umbral de cambio como sea necesario
+      previousFlowValue = flowValue;
+
+      // Guardar los datos de los sensores en la base de datos
+      saveSensorData(previousTemperatureValue, previousPhValue, flowValue);
+    }
+  });
+
 });
 function moveServo() {
   // Comprobar si el servo se ha inicializado
