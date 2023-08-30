@@ -5,7 +5,7 @@ Este proyecto utiliza un Arduino para recolectar datos de varios sensores y cont
 ## Requisitos
 
 - Node.js y npm
-- MongoDB
+- sqlLite for raspbian OS
 - Arduino con firmware StandardFirmataPlus cargado
 - Sensores y un servomotor conectados a tu Arduino
 
